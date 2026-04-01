@@ -1,0 +1,28 @@
+{
+  "name": "mainul-x-bot",
+  "version": "1.0.0",
+  "description": "A lightweight and powerful WhatsApp Video Downloader Bot for Termux",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "downloader",
+    "termux",
+    "baileys"
+  ],
+  "author": "Md. Mainul Islam (MAINUL - X)",
+  "license": "MIT",
+  "dependencies": {
+    "atexovi-baileys": "^6.7.0",
+    "axios": "^1.6.8",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.16",
+    "pino": "^8.19.0",
+    "yt-dlp-exec": "^1.0.2"
+  }
+}
