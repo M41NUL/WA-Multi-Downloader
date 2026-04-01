@@ -104,7 +104,7 @@ function showBanner() {
   originalLog(createRow(chalk.cyanBright('▷ YouTube Downloader'), chalk.gray('(Video/Audio)'), BW, P));
   originalLog(createRow(chalk.blueBright('ⓕ Facebook Downloader'), chalk.gray('(Reels/Video)'), BW, P));
   originalLog(createRow(chalk.magentaBright('ⓘ Instagram Downloader'), chalk.gray('(Reels/Post)'), BW, P));
-  originalLog(createRow(chalk.white('【ꚠ】TikTok Downloader'), chalk.gray('(No Watermark)'), BW, P));
+  originalLog(createRow(chalk.white('ꚠ TikTok Downloader'), chalk.gray('(No Watermark)'), BW, P));
   originalLog(`${P}${chalk.white('├' + '─'.repeat(BW) + '┤')}`);
   originalLog(createRow(chalk.greenBright.bold('DEVELOPER INFORMATION'), '', BW, P));
   originalLog(createRow('─'.repeat(BW - 2), '', BW, P));
