@@ -21,7 +21,7 @@ async function sendInteractive(sock, from, text, buttons = []) {
         },
         interactiveMessage: proto.Message.InteractiveMessage.create({
           body: proto.Message.InteractiveMessage.Body.create({ text }),
-          footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+          footer: proto.Message.InteractiveMessage.Footer.create({ text: ` ${config.COPYRIGHT}` }),
           header: proto.Message.InteractiveMessage.Header.create({
             title: "",
             hasMediaAttachment: false
@@ -40,7 +40,7 @@ async function sendBackButton(sock, from, text) {
     {
       name: 'quick_reply',
       buttonParamsJson: JSON.stringify({
-        display_text: '🔙 Back to Menu',
+        display_text: ' Back to Menu',
         id: 'back_to_menu'
       })
     }
@@ -98,7 +98,7 @@ export async function handler(sock, msg) {
           `▷ *YouTube Downloader* (Video/Audio)\n` +
           `ⓕ *Facebook Downloader* (Reels/Video)\n` +
           `🅾 *Instagram Downloader* (Reels/Post)\n` +
-          `【ꚠ】 *TikTok Downloader* (No Watermark)\n\n` +
+          `【ꚠ】*TikTok Downloader* (No Watermark)\n\n` +
           `_More features coming soon!_`;
         await sendBackButton(sock, from, toolsText);
         userState.set(from, { step: 'menuMain' });
@@ -107,13 +107,13 @@ export async function handler(sock, msg) {
       case 'dev_info': {
         const devText =
           `👨‍💻 *DEVELOPER INFORMATION*\n\n` +
-          `*Name:* ${config.AUTHOR}\n` +
-          `*Owner:* ${config.OWNER}\n` +
-          `*WhatsApp:* ${config.WHATSAPP}\n` +
-          `*Telegram:* ${config.TELEGRAM}\n` +
-          `*GitHub:* ${config.GITHUB_URL}\n` +
-          `*Email:* ${config.EMAIL}\n\n` +
-          `🛡️ *${config.COPYRIGHT}*`;
+          `*• Name:* ${config.AUTHOR}\n` +
+          `*• Owner:* ${config.OWNER}\n` +
+          `*• WhatsApp:* ${config.WHATSAPP}\n` +
+          `*• Telegram:* ${config.TELEGRAM}\n` +
+          `*• GitHub:* ${config.GITHUB_URL}\n` +
+          `*• Email :* ${config.EMAIL}`;
+          
         await sendBackButton(sock, from, devText);
         userState.set(from, { step: 'menuMain' });
         break;
@@ -217,7 +217,7 @@ export async function sendDownloaderMenu(sock, from) {
         },
         interactiveMessage: proto.Message.InteractiveMessage.create({
           body: proto.Message.InteractiveMessage.Body.create({ text: welcomeText }),
-          footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+          footer: proto.Message.InteractiveMessage.Footer.create({ text: ` ${config.COPYRIGHT}` }),
           header: proto.Message.InteractiveMessage.Header.create({
             title: '',
             hasMediaAttachment: !!mediaMsg,
