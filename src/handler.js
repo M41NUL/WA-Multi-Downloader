@@ -1,7 +1,6 @@
-// src/handler.js
 import fs from 'fs';
 import path from 'path';
-import { generateWAMessageFromContent, proto } from 'atexovi-baileys';
+import { generateWAMessageFromContent, prepareWAMessageMedia, proto } from 'atexovi-baileys';
 import { userState } from './userState.js';
 import { handleYouTubeDownloader } from './features/youtube.js';
 import { handleFacebookDownloader } from './features/facebook.js';
@@ -23,6 +22,10 @@ async function sendInteractive(sock, from, text, buttons = []) {
         interactiveMessage: proto.Message.InteractiveMessage.create({
           body: proto.Message.InteractiveMessage.Body.create({ text }),
           footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+          header: proto.Message.InteractiveMessage.Header.create({
+            title: "",
+            hasMediaAttachment: false
+          }),
           nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons })
         })
       }
@@ -60,10 +63,10 @@ export async function handler(sock, msg) {
   try {
     if (msg.message?.interactiveResponseMessage?.nativeFlowResponseMessage) {
       rowId = JSON.parse(msg.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson).id;
-    } else if (msg.message?.listResponseMessage?.singleSelectReply?.selectedRowId) {
-      rowId = msg.message.listResponseMessage.singleSelectReply.selectedRowId;
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[DEBUG] Gagal parsing rowId:', err);
+  }
 
   if (rowId === 'back_to_menu') {
     await sendDownloaderMenu(sock, from);
@@ -121,7 +124,7 @@ export async function handler(sock, msg) {
     return;
   }
 
-  if (text) {
+  if (text && state.step !== 'menuMain' && state.step !== 'start') {
     switch (state.step) {
       case 'yt_wait_url':
         if (!validateUrl(text, 'youtube')) {
@@ -153,8 +156,7 @@ export async function handler(sock, msg) {
         break;
       default:
         await sendDownloaderMenu(sock, from);
-        userState.set(from, { step: 'menuMain' });
-        return;
+        break;
     }
     userState.set(from, { step: 'menuMain' });
     return;
@@ -197,35 +199,35 @@ export async function sendDownloaderMenu(sock, from) {
     },
   ];
 
+  let mediaMsg = null;
+  
   if (fs.existsSync(menuImagePath)) {
-    const imageMsg = generateWAMessageFromContent(from, {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2
-          },
-          interactiveMessage: proto.Message.InteractiveMessage.create({
-            body: proto.Message.InteractiveMessage.Body.create({ text: welcomeText }),
-            footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
-            header: proto.Message.InteractiveMessage.Header.create({
-              title: '',
-              hasMediaAttachment: true,
-              imageMessage: proto.Message.ImageMessage.create({
-                url: '',
-                mimetype: 'image/jpeg',
-                jpegThumbnail: fs.readFileSync(menuImagePath),
-                fileLength: fs.statSync(menuImagePath).size,
-              })
-            }),
-            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons })
-          })
-        }
-      }
-    }, { userJid: sock.user.jid });
-
-    await sock.relayMessage(from, imageMsg.message, { messageId: imageMsg.key.id });
-  } else {
-    await sendInteractive(sock, from, welcomeText, buttons);
+    mediaMsg = await prepareWAMessageMedia(
+      { image: fs.readFileSync(menuImagePath) },
+      { upload: sock.waUploadToServer }
+    );
   }
+
+  const msg = generateWAMessageFromContent(from, {
+    viewOnceMessage: {
+      message: {
+        messageContextInfo: {
+          deviceListMetadata: {},
+          deviceListMetadataVersion: 2
+        },
+        interactiveMessage: proto.Message.InteractiveMessage.create({
+          body: proto.Message.InteractiveMessage.Body.create({ text: welcomeText }),
+          footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+          header: proto.Message.InteractiveMessage.Header.create({
+            title: '',
+            hasMediaAttachment: !!mediaMsg,
+            ...(mediaMsg || {})
+          }),
+          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons })
+        })
+      }
+    }
+  }, { userJid: sock.user.jid });
+
+  await sock.relayMessage(from, msg.message, { messageId: msg.key.id });
 }
