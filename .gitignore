@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# WhatsApp Session (Highly Important to ignore)
+session/
+
+# Environment Variables
+.env
+
+# Temp Media Files (Video Downloads)
+*.mp4
+tmp_yt.mp4
+tmp_fb.mp4
+tmp_ig.mp4
+tmp_tt.mp4
+
+# OS Files
+.DS_Store
+Thumbs.db
