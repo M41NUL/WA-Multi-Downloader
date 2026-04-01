@@ -97,8 +97,8 @@ export async function handler(sock, msg) {
           `🛠️ *TOOLS INFORMATION*\n\n` +
           `▷ *YouTube Downloader* (Video/Audio)\n` +
           `ⓕ *Facebook Downloader* (Reels/Video)\n` +
-          `🅾 *Instagram Downloader* (Reels/Post)\n` +
-          `【ꚠ】*TikTok Downloader* (No Watermark)\n\n` +
+          `ⓘ*Instagram Downloader* (Reels/Post)\n` +
+          `【ꚠ】  *TikTok Downloader* (No Watermark)\n\n` +
           `_More features coming soon!_`;
         await sendBackButton(sock, from, toolsText);
         userState.set(from, { step: 'menuMain' });
@@ -168,7 +168,7 @@ export async function handler(sock, msg) {
 
 export async function sendDownloaderMenu(sock, from) {
   const welcomeText =
-    `👋 Hello there!\nWelcome to *WA-Multi-Downloader*.\n\n` +
+    `👋 Hello there! Welcome to *WA-Multi-Downloader*.\n\n` +
     `I am an automated bot developed by *${config.OWNER}*.\n\n` +
     `👇 Please click the button below to open the menu!`;
 
@@ -176,7 +176,7 @@ export async function sendDownloaderMenu(sock, from) {
     {
       name: 'single_select',
       buttonParamsJson: JSON.stringify({
-        title: '📋 Open Menu',
+        title: 'Open Menu',
         sections: [
           {
             title: '📥 Select Platform',
