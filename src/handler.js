@@ -1,6 +1,7 @@
 // src/handler.js
 import fs from 'fs';
 import path from 'path';
+import { generateWAMessageFromContent, proto } from 'atexovi-baileys';
 import { userState } from './userState.js';
 import { handleYouTubeDownloader } from './features/youtube.js';
 import { handleFacebookDownloader } from './features/facebook.js';
@@ -10,6 +11,38 @@ import { validateUrl } from './utils/validateUrl.js';
 import config from '../config.js';
 
 const menuImagePath = path.join(process.cwd(), 'src/assets/menu.jpg');
+
+async function sendInteractive(sock, from, text, buttons = []) {
+  const msg = generateWAMessageFromContent(from, {
+    viewOnceMessage: {
+      message: {
+        messageContextInfo: {
+          deviceListMetadata: {},
+          deviceListMetadataVersion: 2
+        },
+        interactiveMessage: proto.Message.InteractiveMessage.create({
+          body: proto.Message.InteractiveMessage.Body.create({ text }),
+          footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons })
+        })
+      }
+    }
+  }, { userJid: sock.user.jid });
+
+  await sock.relayMessage(from, msg.message, { messageId: msg.key.id });
+}
+
+async function sendBackButton(sock, from, text) {
+  await sendInteractive(sock, from, text, [
+    {
+      name: 'quick_reply',
+      buttonParamsJson: JSON.stringify({
+        display_text: '🔙 Back to Menu',
+        id: 'back_to_menu'
+      })
+    }
+  ]);
+}
 
 export async function handler(sock, msg) {
   if (!msg?.message) return;
@@ -32,8 +65,7 @@ export async function handler(sock, msg) {
     }
   } catch (err) {}
 
-  const btnId = msg.message?.buttonsResponseMessage?.selectedButtonId;
-  if (btnId === 'back_to_menu') {
+  if (rowId === 'back_to_menu') {
     await sendDownloaderMenu(sock, from);
     userState.set(from, { step: 'menuMain' });
     return;
@@ -43,19 +75,19 @@ export async function handler(sock, msg) {
     switch (rowId) {
       case 'yt_downloader':
         userState.set(from, { step: 'yt_wait_url' });
-        await sock.sendMessage(from, { text: '📌 Please send the *YouTube* video link:' });
+        await sendBackButton(sock, from, '📌 Please send the *YouTube* video link:');
         break;
       case 'fb_downloader':
         userState.set(from, { step: 'fb_wait_url' });
-        await sock.sendMessage(from, { text: '📌 Please send the *Facebook* video link:' });
+        await sendBackButton(sock, from, '📌 Please send the *Facebook* video link:');
         break;
       case 'ig_downloader':
         userState.set(from, { step: 'ig_wait_url' });
-        await sock.sendMessage(from, { text: '📌 Please send the *Instagram* video link:' });
+        await sendBackButton(sock, from, '📌 Please send the *Instagram* video link:');
         break;
       case 'tt_downloader':
         userState.set(from, { step: 'tt_wait_url' });
-        await sock.sendMessage(from, { text: '📌 Please send the *TikTok* video link:' });
+        await sendBackButton(sock, from, '📌 Please send the *TikTok* video link:');
         break;
       case 'tools_info': {
         const toolsText =
@@ -65,10 +97,7 @@ export async function handler(sock, msg) {
           `🅾 *Instagram Downloader* (Reels/Post)\n` +
           `【ꚠ】 *TikTok Downloader* (No Watermark)\n\n` +
           `_More features coming soon!_`;
-        await sock.sendMessage(from, {
-          text: toolsText,
-          buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-        });
+        await sendBackButton(sock, from, toolsText);
         userState.set(from, { step: 'menuMain' });
         break;
       }
@@ -82,10 +111,7 @@ export async function handler(sock, msg) {
           `*GitHub:* ${config.GITHUB_URL}\n` +
           `*Email:* ${config.EMAIL}\n\n` +
           `🛡️ *${config.COPYRIGHT}*`;
-        await sock.sendMessage(from, {
-          text: devText,
-          buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-        });
+        await sendBackButton(sock, from, devText);
         userState.set(from, { step: 'menuMain' });
         break;
       }
@@ -99,40 +125,28 @@ export async function handler(sock, msg) {
     switch (state.step) {
       case 'yt_wait_url':
         if (!validateUrl(text, 'youtube')) {
-          await sock.sendMessage(from, {
-            text: '❌ Invalid URL. Please send a valid YouTube link.',
-            buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-          });
+          await sendBackButton(sock, from, '❌ Invalid URL. Please send a valid YouTube link.');
           return;
         }
         await handleYouTubeDownloader(sock, from, text);
         break;
       case 'fb_wait_url':
         if (!validateUrl(text, 'facebook')) {
-          await sock.sendMessage(from, {
-            text: '❌ Invalid URL. Please send a valid Facebook link.',
-            buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-          });
+          await sendBackButton(sock, from, '❌ Invalid URL. Please send a valid Facebook link.');
           return;
         }
         await handleFacebookDownloader(sock, from, text);
         break;
       case 'ig_wait_url':
         if (!validateUrl(text, 'instagram')) {
-          await sock.sendMessage(from, {
-            text: '❌ Invalid URL. Please send a valid Instagram link.',
-            buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-          });
+          await sendBackButton(sock, from, '❌ Invalid URL. Please send a valid Instagram link.');
           return;
         }
         await handleInstagramDownloader(sock, from, text);
         break;
       case 'tt_wait_url':
         if (!validateUrl(text, 'tiktok')) {
-          await sock.sendMessage(from, {
-            text: '❌ Invalid URL. Please send a valid TikTok link.',
-            buttons: [{ buttonId: 'back_to_menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }]
-          });
+          await sendBackButton(sock, from, '❌ Invalid URL. Please send a valid TikTok link.');
           return;
         }
         await handleTikTokDownloader(sock, from, text);
@@ -156,42 +170,62 @@ export async function sendDownloaderMenu(sock, from) {
     `I am an automated bot developed by *${config.OWNER}*.\n\n` +
     `👇 Please click the button below to open the menu!`;
 
-  const messageContent = {
-    footer: `🛡️ ${config.COPYRIGHT}`,
-    interactiveButtons: [
-      {
-        name: 'single_select',
-        buttonParamsJson: JSON.stringify({
-          title: '📋 Open Menu',
-          sections: [
-            {
-              title: '📥 Select Platform',
-              rows: [
-                { title: 'YouTube Downloader', description: 'Download videos from YouTube', id: 'yt_downloader' },
-                { title: 'Facebook Downloader', description: 'Download videos from Facebook', id: 'fb_downloader' },
-                { title: 'Instagram Downloader', description: 'Download videos from Instagram', id: 'ig_downloader' },
-                { title: 'TikTok Downloader', description: 'Download videos from TikTok', id: 'tt_downloader' },
-              ],
-            },
-            {
-              title: 'ℹ️ Information',
-              rows: [
-                { title: '🛠️ Tools Information', description: 'See all available tools and features', id: 'tools_info' },
-                { title: '👨‍💻 Developer Information', description: 'View developer details & contact', id: 'dev_info' },
-              ],
-            },
-          ],
-        }),
-      },
-    ],
-  };
+  const buttons = [
+    {
+      name: 'single_select',
+      buttonParamsJson: JSON.stringify({
+        title: '📋 Open Menu',
+        sections: [
+          {
+            title: '📥 Select Platform',
+            rows: [
+              { title: 'YouTube Downloader', description: 'Download videos from YouTube', id: 'yt_downloader' },
+              { title: 'Facebook Downloader', description: 'Download videos from Facebook', id: 'fb_downloader' },
+              { title: 'Instagram Downloader', description: 'Download videos from Instagram', id: 'ig_downloader' },
+              { title: 'TikTok Downloader', description: 'Download videos from TikTok', id: 'tt_downloader' },
+            ],
+          },
+          {
+            title: 'ℹ️ Information',
+            rows: [
+              { title: '🛠️ Tools Information', description: 'See all available tools and features', id: 'tools_info' },
+              { title: '👨‍💻 Developer Information', description: 'View developer details & contact', id: 'dev_info' },
+            ],
+          },
+        ],
+      }),
+    },
+  ];
 
   if (fs.existsSync(menuImagePath)) {
-    messageContent.image = fs.readFileSync(menuImagePath);
-    messageContent.caption = welcomeText;
-  } else {
-    messageContent.text = welcomeText;
-  }
+    const imageMsg = generateWAMessageFromContent(from, {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.create({
+            body: proto.Message.InteractiveMessage.Body.create({ text: welcomeText }),
+            footer: proto.Message.InteractiveMessage.Footer.create({ text: `🛡️ ${config.COPYRIGHT}` }),
+            header: proto.Message.InteractiveMessage.Header.create({
+              title: '',
+              hasMediaAttachment: true,
+              imageMessage: proto.Message.ImageMessage.create({
+                url: '',
+                mimetype: 'image/jpeg',
+                jpegThumbnail: fs.readFileSync(menuImagePath),
+                fileLength: fs.statSync(menuImagePath).size,
+              })
+            }),
+            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons })
+          })
+        }
+      }
+    }, { userJid: sock.user.jid });
 
-  await sock.sendMessage(from, messageContent);
+    await sock.relayMessage(from, imageMsg.message, { messageId: imageMsg.key.id });
+  } else {
+    await sendInteractive(sock, from, welcomeText, buttons);
+  }
 }
