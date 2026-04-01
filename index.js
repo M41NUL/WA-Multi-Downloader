@@ -104,7 +104,7 @@ function showBanner() {
   originalLog(createRow(chalk.cyanBright('▷ YouTube Downloader'), chalk.gray('(Video/Audio)'), BW, P));
   originalLog(createRow(chalk.blueBright('ⓕ Facebook Downloader'), chalk.gray('(Reels/Video)'), BW, P));
   originalLog(createRow(chalk.magentaBright('ⓘ Instagram Downloader'), chalk.gray('(Reels/Post)'), BW, P));
-  originalLog(createRow(chalk.white('ꚠ TikTok Downloader'), chalk.gray('(No Watermark)'), BW, P));
+  originalLog(createRow(chalk.white('【ꚠ】TikTok Downloader'), chalk.gray('(No Watermark)'), BW, P));
   originalLog(`${P}${chalk.white('├' + '─'.repeat(BW) + '┤')}`);
   originalLog(createRow(chalk.greenBright.bold('DEVELOPER INFORMATION'), '', BW, P));
   originalLog(createRow('─'.repeat(BW - 2), '', BW, P));
@@ -176,7 +176,7 @@ async function startBot() {
         {
           type: 'input',
           name: 'waNumber',
-          message: 'Enter WhatsApp Number:',
+          message: 'Enter Bot WhatsApp Number (without +):'),
           validate: (input) => /^\d{8,}$/.test(input) ? true : 'Invalid Number',
         },
       ]);
@@ -185,16 +185,23 @@ async function startBot() {
       process.exit(0);
     }
 
-    try {
-      setTimeout(async () => {
-        const code = await sock.requestPairingCode(waNumber);
-        console.log(chalk.green('\nPairing Code:'));
-        console.log(chalk.bgMagenta.white(` ${code} `));
-      }, 2000);
-    } catch (error) {
-      console.error(chalk.red('Pairing Error'), error);
-    }
-  }
+    try {  
+  setTimeout(async () => {  
+    const code = await sock.requestPairingCode(waNumber);  
+    console.log(chalk.greenBright('\nPairing Code Generated Successfully!'));  
+    console.log(chalk.yellowBright('Your Code:'), chalk.bold.bgMagenta.white(` ${code} `));  
+    console.log(chalk.cyan('\nSteps to Login:'));  
+    console.log(chalk.cyan('  1. Open WhatsApp on your phone'));  
+    console.log(chalk.cyan('  2. Go to Linked Devices › Link a Device'));  
+    console.log(chalk.cyan('  3. Click "Link with phone number instead"'));  
+    console.log(chalk.cyan('  4. Enter the code above'));  
+    console.log(chalk.greenBright('\nWaiting for connection...\n'));  
+  }, 2000);  
+} catch (error) {  
+  console.error(chalk.red('Error generating pairing code:'), error);  
+}
+
+}
 }
 
 startBot();
