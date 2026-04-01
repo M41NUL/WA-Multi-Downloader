@@ -9,11 +9,11 @@ import process from 'process';
 import dotenv from 'dotenv';
 import { handler } from './src/handler.js';
 import { wrapSendMessageGlobally } from './src/utils/typing.js';
-import config from './config.js'; // Developer Info Connect করা হলো
+import config from './config.js'; 
 
 dotenv.config({ debug: false });
 
-// Baileys এর ফালতু লগগুলো হাইড করার জন্য Console ইন্টারসেপ্টর
+
 const originalError = console.error;
 const originalLog = console.log;
 const originalStdoutWrite = process.stdout.write;
