@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node index.js"
+  	"test": "echo \"Error: no test specified\" && exit 1"
   },
+  
   "keywords": [
     "whatsapp",
     "bot",
@@ -17,12 +19,16 @@
   "author": "Md. Mainul Islam (MAINUL - X)",
   "license": "MIT",
   "dependencies": {
-    "atexovi-baileys": "^6.7.0",
-    "axios": "^1.6.8",
-    "chalk": "^5.3.0",
-    "dotenv": "^16.4.5",
-    "inquirer": "^9.2.16",
-    "pino": "^8.19.0",
+    "atexovi-baileys": "7.5.6-rc.6",
+    "chalk": "^5.6.2",
+    "cli-table3": "^0.6.5",
+    "dotenv": "^17.2.3",
+    "figlet": "^1.9.3",
+    "inquirer": "^12.9.6",
+    "jimp": "^1.6.0",
+    "lru-cache": "^10.0.0",
+    "ora": "^9.0.0",
+    "pino": "^10.1.0",
     "yt-dlp-exec": "^1.0.2"
   }
 }
