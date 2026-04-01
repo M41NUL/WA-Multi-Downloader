@@ -17,27 +17,11 @@ const originalLog = console.log;
 const originalStdoutWrite = process.stdout.write;
 
 const FILTER_PATTERNS = [
-  'Bad MAC',
-  'Failed to decrypt message with any known session',
-  'Session error:',
-  'Failed to decrypt',
-  'Closing open session',
-  'Closing session:',
-  'SessionEntry',
-  '_chains:',
-  'registrationId:',
-  'currentRatchet:',
-  'indexInfo:',
-  '<Buffer',
-  'pubKey:',
-  'privKey:',
-  'baseKey:',
-  'remoteIdentityKey:',
-  'lastRemoteEphemeralKey:',
-  'ephemeralKeyPair:',
-  'chainKey:',
-  'chainType:',
-  'messageKeys:'
+  'Bad MAC','Failed to decrypt message with any known session','Session error:',
+  'Failed to decrypt','Closing open session','Closing session:','SessionEntry',
+  '_chains:','registrationId:','currentRatchet:','indexInfo:','<Buffer',
+  'pubKey:','privKey:','baseKey:','remoteIdentityKey:',
+  'lastRemoteEphemeralKey:','ephemeralKeyPair:','chainKey:','chainType:','messageKeys:'
 ];
 
 process.stdout.write = function(chunk, encoding, callback) {
@@ -57,7 +41,9 @@ process.stdout.write = function(chunk, encoding, callback) {
 console.error = function(...args) {
   const msg = args.join(' ');
   if (FILTER_PATTERNS.some(p => msg.includes(p))) {
-    if (msg.includes('Bad MAC')) originalLog.call(console, chalk.yellow('🔄 Signal Protocol: Securing connection...'));
+    if (msg.includes('Bad MAC')) {
+      originalLog.call(console, chalk.yellow('🔄 Signal Protocol: Securing connection...'));
+    }
     return;
   }
   originalError.apply(console, args);
@@ -90,49 +76,51 @@ function center(text, width) {
   return ' '.repeat(pad) + text;
 }
 
-export function showBanner() {
+function createRow(left, right, BW, P) {
+  const cleanLeft = stripAnsi(left);
+  const cleanRight = stripAnsi(right);
+  const space = BW - cleanLeft.length - cleanRight.length - 2;
+  return `${P}${chalk.white('│ ')}${left}${' '.repeat(space > 0 ? space : 0)}${right}${chalk.white(' │')}`;
+}
+
+function showBanner() {
+  process.stdout.write('\x1Bc');
   console.clear();
-  const W = Math.max(process.stdout.columns || 80, 70);
-  const BW = 56;
+
+  const W = process.stdout.columns || 80;
+  const BW = Math.min(70, W - 10);
   const P = ' '.repeat(Math.max(0, Math.floor((W - BW - 2) / 2)));
 
   console.log();
   bannerLines.forEach(l => originalLog(center(chalk.cyanBright(l), W)));
   console.log();
-  originalLog(center(chalk.magentaBright.bold('🚀  WA-Multi-Downloader  v1.0.0'), W));
-  originalLog(center(chalk.greenBright('🟢  Status: Online'), W));
+  originalLog(center(chalk.magentaBright.bold('WA-Multi-Downloader v1.0.0'), W));
+  originalLog(center(chalk.greenBright('Status: Online'), W));
   console.log();
 
-  function row(left, right = '') {
-    const inner = ' ' + left + right;
-    const vis = stripAnsi(inner).length;
-    const spaces = Math.max(0, BW - vis);
-    return `${P}${chalk.white('│')}${inner}${' '.repeat(spaces)}${chalk.white('│')}`;
-  }
-
-  originalLog(`${P}${chalk.white('╭' + '─'.repeat(BW) + '╮')}`);
-  originalLog(row(chalk.yellowBright.bold(' 🛠️   TOOLS INFORMATION')));
-  originalLog(row(chalk.white(' ──────────────────────────────────────────────────')));
-  originalLog(row(chalk.cyanBright(' ▷ YouTube Downloader    '), chalk.gray('(Video / Audio) ')));
-  originalLog(row(chalk.blueBright(' ⓕ Facebook Downloader   '), chalk.gray('(Reels / Video) ')));
-  originalLog(row(chalk.magentaBright(' 🅾 Instagram Downloader  '), chalk.gray('(Reels / Post)  ')));
-  originalLog(row(chalk.white('【ꚠ】TikTok Downloader    '), chalk.gray('(No Watermark)  ')));
+  originalLog(`${P}${chalk.white('┌' + '─'.repeat(BW) + '┐')}`);
+  originalLog(createRow(chalk.yellowBright.bold('TOOLS INFORMATION'), '', BW, P));
+  originalLog(createRow('─'.repeat(BW - 2), '', BW, P));
+  originalLog(createRow(chalk.cyanBright('▷ YouTube Downloader'), chalk.gray('(Video/Audio)'), BW, P));
+  originalLog(createRow(chalk.blueBright('ⓕ Facebook Downloader'), chalk.gray('(Reels/Video)'), BW, P));
+  originalLog(createRow(chalk.magentaBright('ⓘ Instagram Downloader'), chalk.gray('(Reels/Post)'), BW, P));
+  originalLog(createRow(chalk.white('【ꚠ】TikTok Downloader'), chalk.gray('(No Watermark)'), BW, P));
   originalLog(`${P}${chalk.white('├' + '─'.repeat(BW) + '┤')}`);
-  originalLog(row(chalk.greenBright.bold(' 👨‍💻  DEVELOPER INFORMATION')));
-  originalLog(row(chalk.white(' ──────────────────────────────────────────────────')));
-  originalLog(row(chalk.white('  © Owner  : '), chalk.cyanBright(String(config.OWNER))));
-  originalLog(row(chalk.white('    GitHub : '), chalk.cyanBright(String(config.GITHUB))));
-  originalLog(row(chalk.white('  ✉ Email  : '), chalk.cyanBright('devmainulislam@gmail.com')));
-  originalLog(`${P}${chalk.white('╰' + '─'.repeat(BW) + '╯')}`);
+  originalLog(createRow(chalk.greenBright.bold('DEVELOPER INFORMATION'), '', BW, P));
+  originalLog(createRow('─'.repeat(BW - 2), '', BW, P));
+  originalLog(createRow('Owner  :', chalk.cyanBright(String(config.OWNER)), BW, P));
+  originalLog(createRow('GitHub :', chalk.cyanBright(String(config.GITHUB)), BW, P));
+  originalLog(createRow('Email  :', chalk.cyanBright('devmainulislam@gmail.com'), BW, P));
+  originalLog(`${P}${chalk.white('└' + '─'.repeat(BW) + '┘')}`);
   console.log();
 }
 
-let bannerShown = false;
+global.bannerShown = global.bannerShown || false;
 
 async function startBot() {
-  if (!bannerShown) {
+  if (!global.bannerShown) {
     showBanner();
-    bannerShown = true;
+    global.bannerShown = true;
   }
 
   const { state, saveCreds } = await useMultiFileAuthState(authDir);
@@ -147,17 +135,21 @@ async function startBot() {
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
+
     if (connection === 'open') {
-      console.log(chalk.greenBright('\n✅ Successfully Connected to WhatsApp!'));
-      console.log(chalk.cyan(`👤 Bot Number: ${sock.user?.id.split(':')[0]}`));
-    } else if (connection === 'close') {
+      console.log(chalk.greenBright('\nConnected to WhatsApp!'));
+      console.log(chalk.cyan(`Bot Number: ${sock.user?.id.split(':')[0]}`));
+    } 
+
+    else if (connection === 'close') {
       const reason = lastDisconnect?.error?.output?.statusCode;
       const shouldReconnect = reason !== DisconnectReason.loggedOut;
+
       if (shouldReconnect) {
-        console.log(chalk.yellow('\n🔁 Connection dropped, reconnecting...'));
-        startBot();
+        console.log(chalk.yellow('\nReconnecting...'));
+        setTimeout(() => startBot(), 2000);
       } else {
-        console.log(chalk.red('\n❌ Session invalid or logged out. Please delete the "session" folder and restart.'));
+        console.log(chalk.red('\nSession expired. Delete session folder.'));
       }
     }
   });
@@ -167,45 +159,40 @@ async function startBot() {
   sock.ev.on('messages.upsert', async (m) => {
     const msg = m.messages?.[0];
     if (!msg || msg.key.fromMe) return;
+
     try {
       await handler(sock, msg);
     } catch (err) {
-      console.error(chalk.red('[Handler Error]'), err);
+      console.error(chalk.red('Handler Error'), err);
     }
   });
 
   if (!sock.authState.creds.registered) {
     let waNumber;
+
     try {
-      console.log(chalk.yellowBright('\n⚠️  Session not found! Please login.'));
+      console.log(chalk.yellow('\nLogin Required'));
       const response = await inquirer.prompt([
         {
           type: 'input',
           name: 'waNumber',
-          message: chalk.cyanBright('Enter Bot WhatsApp Number (without +):'),
-          validate: (input) => /^\d{8,}$/.test(input) ? true : 'Invalid Number. Example: 8801308850528',
+          message: 'Enter WhatsApp Number:',
+          validate: (input) => /^\d{8,}$/.test(input) ? true : 'Invalid Number',
         },
       ]);
       waNumber = response.waNumber.replace(/[^0-9]/g, '');
     } catch (err) {
-      if (err.name === 'ExitPromptError') process.exit(0);
-      else throw err;
+      process.exit(0);
     }
 
     try {
       setTimeout(async () => {
         const code = await sock.requestPairingCode(waNumber);
-        console.log(chalk.greenBright('\n✅ Pairing Code Generated Successfully!'));
-        console.log(chalk.yellowBright('📌 Your Code:'), chalk.bold.bgMagenta.white(` ${code} `));
-        console.log(chalk.cyan('\nSteps to Login:'));
-        console.log(chalk.cyan('  1. Open WhatsApp on your phone'));
-        console.log(chalk.cyan('  2. Go to Linked Devices › Link a Device'));
-        console.log(chalk.cyan('  3. Click "Link with phone number instead"'));
-        console.log(chalk.cyan('  4. Enter the code above'));
-        console.log(chalk.greenBright('\nWaiting for connection...\n'));
+        console.log(chalk.green('\nPairing Code:'));
+        console.log(chalk.bgMagenta.white(` ${code} `));
       }, 2000);
     } catch (error) {
-      console.error(chalk.red('❌ Error generating pairing code:'), error);
+      console.error(chalk.red('Pairing Error'), error);
     }
   }
 }
