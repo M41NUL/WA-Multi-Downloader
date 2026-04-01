@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "A lightweight and powerful WhatsApp Video Downloader Bot for Termux",
   "main": "index.js",
-  "type": "module",
+    "type": "module",
   "scripts": {
-    "start": "node index.js"
-  	"test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  
   "keywords": [
     "whatsapp",
     "bot",
