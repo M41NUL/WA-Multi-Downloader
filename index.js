@@ -116,7 +116,7 @@ export function showBanner() {
   originalLog(row(chalk.cyanBright('  ▷  YouTube Downloader    '), chalk.gray('(Video / Audio) ')));
   originalLog(row(chalk.blueBright('  ⓕ  Facebook Downloader   '), chalk.gray('(Reels / Video) ')));
   originalLog(row(chalk.magentaBright('  🅾  Instagram Downloader  '), chalk.gray('(Reels / Post)  ')));
-  originalLog(row(chalk.white('  【ꚠ】TikTok Downloader    '), chalk.gray('(No Watermark)  ')));
+  originalLog(row(chalk.white(' 【ꚠ】TikTok Downloader    '), chalk.gray('(No Watermark)  ')));
   originalLog(`${P}${chalk.white('├' + '─'.repeat(BW) + '┤')}`);
   originalLog(row(chalk.greenBright.bold(' 👨‍💻  DEVELOPER INFORMATION')));
   originalLog(row(chalk.white(' ──────────────────────────────────────────────────')));
