@@ -10,7 +10,7 @@ export function wrapSendMessageGlobally(sock) {
       await sock.sendPresenceUpdate('composing', jid);
 
       // small delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 600));
 
       // send message
       const result = await originalSendMessage(jid, content, options);
