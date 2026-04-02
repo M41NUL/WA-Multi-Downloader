@@ -340,7 +340,7 @@ npm install && npm start
 | 📧 | **Email (GitHub)** | githubmainul@gmail.com |
 | 📧 | **Email (Dev)** | devmainulislam@gmail.com |
 | 📄 | **License** | MIT License |
-| © | **Copyright** | Copyright (c) 2025 **MAINUL - X** |
+| © | **Copyright** | Copyright (c) 2026 **MAINUL - X** |
 
 <br/>
 
@@ -369,7 +369,7 @@ npm install && npm start
 ```
 MIT License
 
-Copyright (c) 2025 MAINUL - X (Md. Mainul Islam)
+Copyright (c) 2026 MAINUL - X (Md. Mainul Islam)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),
