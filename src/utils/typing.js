@@ -1,29 +1,25 @@
+// src/utils/typing.js
 export function wrapSendMessageGlobally(sock) {
   const originalSendMessage = sock.sendMessage.bind(sock);
 
   sock.sendMessage = async (jid, content, options) => {
     try {
-      // subscribe presence
-      await sock.presenceSubscribe(jid);
+      if (content.edit) {
+        return await originalSendMessage(jid, content, options);
+      }
 
-      // show typing
-      await sock.sendPresenceUpdate('composing', jid);
+      sock.presenceSubscribe(jid).catch(() => {});
+      sock.sendPresenceUpdate('composing', jid).catch(() => {});
 
-      // small delay
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise(r => setTimeout(r, 300));
 
-      // send message
       const result = await originalSendMessage(jid, content, options);
 
-      // stop typing
-      await sock.sendPresenceUpdate('paused', jid);
+      sock.sendPresenceUpdate('paused', jid).catch(() => {});
 
       return result;
-
-    } catch (error) {
-      console.error('Typing Error:', error);
-
-      // fallback send
+    } catch (err) {
+      console.error('[Global Typing Error]', err);
       return originalSendMessage(jid, content, options);
     }
   };
