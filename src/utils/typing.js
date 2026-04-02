@@ -11,7 +11,7 @@ export function wrapSendMessageGlobally(sock) {
       sock.presenceSubscribe(jid).catch(() => {});
       sock.sendPresenceUpdate('composing', jid).catch(() => {});
 
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 100));
 
       const result = await originalSendMessage(jid, content, options);
 
