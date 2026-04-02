@@ -173,13 +173,16 @@ async function startBot() {
     try {
       console.log(chalk.yellow('\nLogin Required'));
       const response = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'waNumber',
-          message: 'Enter Bot WhatsApp Number (without +):'),
-          validate: (input) => /^\d{8,}$/.test(input) ? true : 'Invalid Number',
-        },
-      ]);
+  {
+    type: 'input',
+    name: 'waNumber',
+    message: 'Enter Bot WhatsApp Number (without +):',
+    validate: (input) =>
+      /^\d{8,}$/.test(input)
+        ? true
+        : 'Invalid Number. Example: 8801308850528',
+  },
+]);
       waNumber = response.waNumber.replace(/[^0-9]/g, '');
     } catch (err) {
       process.exit(0);
