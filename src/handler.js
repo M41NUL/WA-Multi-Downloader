@@ -94,11 +94,11 @@ export async function handler(sock, msg) {
         break;
       case 'tools_info': {
         const toolsText =
-          `🛠️ *TOOLS INFORMATION*\n\n` +
+          ` *TOOLS INFORMATION*\n\n` +
           `▷ *YouTube Downloader* (Video/Audio)\n` +
           `ⓕ *Facebook Downloader* (Reels/Video)\n` +
-          `ⓘ*Instagram Downloader* (Reels/Post)\n` +
-          `【ꚠ】  *TikTok Downloader* (No Watermark)\n\n` +
+          `ⓘ *Instagram Downloader* (Reels/Post)\n` +
+          `ꚠ *TikTok Downloader* (No Watermark)\n\n` +
           `_More features coming soon!_`;
         await sendBackButton(sock, from, toolsText);
         userState.set(from, { step: 'menuMain' });
@@ -106,7 +106,7 @@ export async function handler(sock, msg) {
       }
       case 'dev_info': {
         const devText =
-          `👨‍💻 *DEVELOPER INFORMATION*\n\n` +
+          ` *DEVELOPER INFORMATION*\n\n` +
           `*• Name:* ${config.AUTHOR}\n` +
           `*• Owner:* ${config.OWNER}\n` +
           `*• WhatsApp:* ${config.WHATSAPP}\n` +
